@@ -411,6 +411,10 @@ class AdaptiveOpticsDevice(Device):
 
     @Pyro4.expose
     def acquire_raw(self):
+        if (self.wavefront_camera.get_trigger_type() != TriggerType.SOFTWARE):
+            previousTrigType=self.wavefront_camera.get_trigger_type()
+            self.wavefront_camera.set_trigger(TriggerType.SOFTWARE,
+                                              TriggerMode.ONCE)
         self.acquiring = True
         while self.acquiring == True:
             try:
@@ -424,10 +428,17 @@ class AdaptiveOpticsDevice(Device):
                     _logger.info(type(e))
                     _logger.info("Error is: %s" % (e))
                     raise e
+        if (previousTrigMode != TriggerType.SOFTWARE):
+            self.wavefront_camera.set_trigger_type(previousTrigType,
+                                                   TriggerMode.ONCE):
         return data_raw
 
     @Pyro4.expose
     def acquire(self):
+        if (self.wavefront_camera.get_trigger_type() != TriggerType.SOFTWARE):
+            previousTrigType=self.wavefront_camera.get_trigger_type()
+            self.wavefront_camera.set_trigger(TriggerType.SOFTWARE,
+                                              TriggerMode.ONCE)
         self.acquiring = True
         while self.acquiring == True:
             try:
@@ -452,6 +463,9 @@ class AdaptiveOpticsDevice(Device):
                 data = data_cropped
             else:
                 data = data_cropped * self.mask
+        if (previousTrigMode != TriggerType.SOFTWARE):
+            self.wavefront_camera.set_trigger_type(previousTrigType,
+                                                   TriggerMode.ONCE):
         return data
 
     @Pyro4.expose
