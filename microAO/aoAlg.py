@@ -29,6 +29,7 @@ import scipy.stats as stats
 from skimage.restoration import unwrap_phase
 from scipy.integrate import trapz
 import microAO.aoMetrics as metrics
+import pyfftw
 
 def gaussian_funcion(x, offset, normalising, mean, std_dev):
     return (offset - normalising) + (normalising * np.exp((-(x - mean) ** 2) / (2 * std_dev ** 2)))
@@ -137,16 +138,16 @@ class AdaptiveOpticsFunctions():
             region = int(data.shape[0]/16)
 
         # Apply tukey window
-        fringes = np.fft.fftshift(data)
+        fringes = pyfftw.interfaces.numpy_fft.fftshift(data)
         tukey_window = tukey(fringes.shape[0], .10, True)
-        tukey_window = np.fft.fftshift(tukey_window.reshape(1, -1) * tukey_window.reshape(-1, 1))
+        tukey_window = pyfftw.interfaces.numpy_fft.fftshift(tukey_window.reshape(1, -1) * tukey_window.reshape(-1, 1))
         fringes_tukey = fringes * tukey_window
 
         # Perform fourier transform
-        fftarray = np.fft.fft2(fringes_tukey)
+        fftarray = pyfftw.interfaces.numpy_fft.fft2(fringes_tukey)
 
         # Remove center section to allow finding of 1st order point
-        fftarray = np.fft.fftshift(fftarray)
+        fftarray = pyfftw.interfaces.numpy_fft.fftshift(fftarray)
         find_cent = [int(fftarray.shape[1]/2),int(fftarray.shape[0]/ 2)]
         fftarray[find_cent[1]-region:find_cent[1]+region,find_cent[0]-region:find_cent[0]+region]=0.00001+0j
 
@@ -196,18 +197,18 @@ class AdaptiveOpticsFunctions():
         data = np.asarray(image)
 
         #Apply tukey window
-        fringes = np.fft.fftshift(data)
+        fringes = pyfftw.interfaces.numpy_fft.fftshift(data)
         tukey_window = tukey(fringes.shape[0], .10, True)
-        tukey_window = np.fft.fftshift(tukey_window.reshape(1, -1)*tukey_window.reshape(-1, 1))
+        tukey_window = pyfftw.interfaces.numpy_fft.fftshift(tukey_window.reshape(1, -1)*tukey_window.reshape(-1, 1))
         fringes_tukey = fringes * tukey_window
 
         #Perform fourier transform
-        fftarray = np.fft.fft2(fringes_tukey)
+        fftarray = pyfftw.interfaces.numpy_fft.fft2(fringes_tukey)
 
         #Apply Fourier filter
-        M = np.fft.fftshift(self.fft_filter)
+        M = pyfftw.interfaces.numpy_fft.fftshift(self.fft_filter)
         fftarray_filt = fftarray * M
-        fftarray_filt = np.fft.fftshift(fftarray_filt)
+        fftarray_filt = pyfftw.interfaces.numpy_fft.fftshift(fftarray_filt)
 
         #Roll data to the centre
         centre_y_array, centre_x_array = np.where(self.fft_filter == np.max(self.fft_filter))
@@ -217,8 +218,9 @@ class AdaptiveOpticsFunctions():
         fftarray_filt = np.roll(fftarray_filt, -g1, axis=0)
 
         #Convert to real space
-        fftarray_filt_shift = np.fft.fftshift(fftarray_filt)
-        complex_phase = np.fft.fftshift(np.fft.ifft2(fftarray_filt_shift))
+        fftarray_filt_shift = pyfftw.interfaces.numpy_fft.fftshift(fftarray_filt)
+        complex_phase = pyfftw.interfaces.numpy_fft.fftshift(
+            pyfftw.interfaces.numpy_fft.ifft2(fftarray_filt_shift))
 
         #Find phase data by taking 2d arctan of imaginary and real parts
         phaseorder1 = np.zeros(complex_phase.shape)
