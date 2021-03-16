@@ -25,6 +25,7 @@ import time
 import aotools
 from microAO.aoAlg import AdaptiveOpticsFunctions
 
+
 # Should fix this with multiple inheritance for this class!
 aoAlg = AdaptiveOpticsFunctions()
 
@@ -166,7 +167,8 @@ class AdaptiveOpticsDevice(Device):
         pattern_ft[freq_loc_half] = 1 / 2
         pattern_ft[freq_loc_quart] = 1 / 4
 
-        pattern_unscaled = abs(np.fft.fft2(np.fft.ifftshift(pattern_ft)))
+        pattern_unscaled = abs(pyfftw.interfaces.numpy_fft.fft2(
+            pyfftw.interfaces.numpy_fft.ifftshift(pattern_ft)))
         pattern = (pattern_unscaled / np.max(pattern_unscaled)) * ((2 ** 16) - 1)
         pattern = pattern.astype("uint16")
         return pattern
