@@ -411,8 +411,8 @@ class AdaptiveOpticsDevice(Device):
 
     @Pyro4.expose
     def acquire_raw(self):
-        if (self.wavefront_camera.get_trigger_type() != TriggerType.SOFTWARE):
-            previousTrigType=self.wavefront_camera.get_trigger_type()
+        previousTrigType=self.wavefront_camera.get_trigger_type()
+        if (previousTrigType != TriggerType.SOFTWARE):
             self.wavefront_camera.set_trigger(TriggerType.SOFTWARE,
                                               TriggerMode.ONCE)
         self.acquiring = True
@@ -435,8 +435,8 @@ class AdaptiveOpticsDevice(Device):
 
     @Pyro4.expose
     def acquire(self):
-        if (self.wavefront_camera.get_trigger_type() != TriggerType.SOFTWARE):
-            previousTrigType=self.wavefront_camera.get_trigger_type()
+        previousTrigType=self.wavefront_camera.get_trigger_type()
+        if (previousTrigType != TriggerType.SOFTWARE):
             self.wavefront_camera.set_trigger(TriggerType.SOFTWARE,
                                               TriggerMode.ONCE)
         self.acquiring = True
