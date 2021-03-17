@@ -190,13 +190,13 @@ class AdaptiveOpticsDevice(Device):
         self.slm.set_custom_sequence(wavelength,[pattern,pattern])
 
     @Pyro4.expose
-    def set_trigger(self, cp_ttype, cp_tmode):
-        ttype = self._CockpitTriggerType_to_TriggerType[cp_ttype]
-        tmode = self._CockpitTriggerModes_to_TriggerModes[cp_tmode]
+    def set_trigger(self, ttype, tmode):
+#        ttype = self._CockpitTriggerType_to_TriggerType[cp_ttype]
+#        tmode = self._CockpitTriggerModes_to_TriggerModes[cp_tmode]
         self.ao_element.set_trigger(ttype, tmode)
 
-        self.last_trigger_type = cp_ttype
-        self.last_trigger_mode = cp_tmode
+        self.last_trigger_type = ttype
+        self.last_trigger_mode = tmode
 
     @Pyro4.expose
     def get_trigger(self):
