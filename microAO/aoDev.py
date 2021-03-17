@@ -287,8 +287,8 @@ class AdaptiveOpticsDevice(Device):
         _logger.info("Sending pattern to AO element")
 
         ttype, tmode = self.get_trigger()
-        if ttype is not "SOFTWARE":
-            self.set_trigger(cp_ttype="SOFTWARE", cp_tmode="ONCE")
+        if ttype != TriggerType.SOFTWARE:
+            self.set_trigger(ttype=TriggerType.SOFTWARE, tmode=TriggerMode.ONCE)
 
         # Need to normalise patterns because general DM class expects 0-1 values
         values[values > 1.0] = 1.0
@@ -301,7 +301,7 @@ class AdaptiveOpticsDevice(Device):
 
         self.last_actuator_values = values
         if (ttype, tmode) is not self.get_trigger():
-            self.set_trigger(cp_ttype=ttype, cp_tmode=tmode)
+            self.set_trigger(ttype=ttype, tmode=tmode)
 
     # This method is for AO elements such as SLMs where the phase shape can be applied directly by sending an image of
     # the desired phase.
@@ -330,8 +330,8 @@ class AdaptiveOpticsDevice(Device):
         _logger.info("Queuing patterns on DM")
 
         ttype, tmode = self.get_trigger()
-        if ttype is not "RISING_EDGE":
-            self.set_trigger(cp_ttype="RISING_EDGE", cp_tmode="ONCE")
+        if ttype != TriggerType.RISING_EDGE:
+            self.set_trigger(ttype=TriggerType.RISING_EDGE, tmode=TriggerMode.ONCE)
 
         # Need to normalise patterns because general DM class expects 0-1 values
         patterns[patterns > 1.0] = 1.0
@@ -344,7 +344,7 @@ class AdaptiveOpticsDevice(Device):
 
         self.last_actuator_patterns = patterns
         if (ttype, tmode) is not self.get_trigger():
-            self.set_trigger(cp_ttype=ttype, cp_tmode=tmode)
+            self.set_trigger(ttype=ttype, tmode=tmode)
 
     @Pyro4.expose
     def get_last_actuator_patterns(self):
@@ -428,9 +428,9 @@ class AdaptiveOpticsDevice(Device):
                     _logger.info(type(e))
                     _logger.info("Error is: %s" % (e))
                     raise e
-        if (previousTrigMode != TriggerType.SOFTWARE):
-            self.wavefront_camera.set_trigger_type(previousTrigType,
-                                                   TriggerMode.ONCE):
+        if (previousTrigType != TriggerType.SOFTWARE):
+            self.wavefront_camera.set_trigger(previousTrigType,
+                                                   TriggerMode.ONCE)
         return data_raw
 
     @Pyro4.expose
@@ -463,9 +463,9 @@ class AdaptiveOpticsDevice(Device):
                 data = data_cropped
             else:
                 data = data_cropped * self.mask
-        if (previousTrigMode != TriggerType.SOFTWARE):
-            self.wavefront_camera.set_trigger_type(previousTrigType,
-                                                   TriggerMode.ONCE):
+        if (previousTrigType != TriggerType.SOFTWARE):
+            self.wavefront_camera.set_trigger(previousTrigType,
+                                                   TriggerMode.ONCE)
         return data
 
     @Pyro4.expose
